@@ -100,7 +100,7 @@ fun HomeScreen(nav: Nav) {
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             HRow(gap = 12) {
                 Image(painterResource(R.drawable.logo), contentDescription = null, modifier = Modifier.size(52.dp))
-                Column(Modifier.clickable { editName = user?.name ?: "" }) {
+                Column(Modifier.clickable { editName = "" }) {
                     Body("Namaste,", dim = true)
                     Title((user?.name ?: "Player") + " ✎")
                 }
@@ -201,7 +201,7 @@ fun HomeScreen(nav: Nav) {
         AlertDialog(
             onDismissRequest = { editName = null },
             title = { Text("Your name") },
-            text = { HsTextField(draft, { editName = it }, "What friends call you", maxLength = 20) },
+            text = { HsTextField(draft, { editName = it }, user?.name ?: "What friends call you", maxLength = 20) },
             confirmButton = {
                 TextButton(onClick = {
                     val name = draft.trim()

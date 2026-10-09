@@ -21,10 +21,14 @@ HideSeek/
    npm test           # 23 tests: rules, payouts, zone, GPS and Bluetooth proximity
    ```
 2. **Install `ChorSipahi.apk`** on each Android phone (allow "install unknown apps").
-3. Phones and the PC must be on the **same Wi-Fi**. If the PC's address differs from the one in the
-   app, tap **⚙ Server** on the login screen and enter it.
+3. Open the app: there is **no login**. Each phone automatically gets a guest player (tied to the
+   device) with a random name; tap your name on the home screen to change it.
+   Phones and the PC must be on the **same Wi-Fi**. If the PC's address differs from the one in the
+   app, tap **⚙ Server** on the home screen (or on the "can't connect" screen) and enter it.
    If phones can't connect, allow Node.js through Windows Firewall (private networks).
-4. In dev mode the OTP is shown on screen and wallet top-ups are credited instantly.
+4. Wallet top-ups are credited instantly in dev mode. Friends can add each other with the 8-character
+   **player code** shown on the home and Friends screens. Guest play is on in dev mode, or with
+   `ALLOW_GUESTS=1`; the phone/OTP login API still exists for a later production build.
 
 **Quick test games:** `GAME_DURATION_SEC=180 HIDE_DURATION_SEC=20 npm start`
 (PowerShell: `$env:GAME_DURATION_SEC=180; npm start`).

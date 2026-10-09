@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Chor Sipahi logo: police-blue / thief-red badge, thief's eye-mask, gold rim and star. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android" android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
+    <path android:strokeColor="#FFFFFF" android:strokeWidth="3.5" android:fillColor="#00000000" android:pathData="M54,23 a31,31 0 1,1 0,62 a31,31 0 1,1 0,-62" />
+    <path android:fillColor="#FFFFFF" android:fillType="evenOdd" android:pathData="M24,50 C28,41 36,42 42,43 L66,43 C72,42 80,41 84,50 C80,60 72,59 66,58 L42,58 C36,59 28,60 24,50 Z M36,50.5 a7,4.5 0 1,0 14,0 a7,4.5 0 1,0 -14,0 Z M58,50.5 a7,4.5 0 1,0 14,0 a7,4.5 0 1,0 -14,0 Z" />
+    <path android:fillColor="#FFFFFF" android:pathData="M54,62 L56,67.25 L61.61,67.53 L57.23,71.05 L58.7,76.47 L54,73.4 L49.3,76.47 L50.77,71.05 L46.39,67.53 L52,67.25 Z" />
+</vector>
