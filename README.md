@@ -36,6 +36,13 @@ HideSeek/
 **Only one phone?** `node scripts/bot.js <ROOM_CODE> [lat] [lng]` adds a scripted second player
 that joins, readies up, flips its card and reports a GPS position.
 
+**Simulate many players (no phones needed):** in `server`, run `npm run sim:server` in one terminal
+(a separate test server on port 4100 with a 60-second hunt) and `npm run simulate` in another. It
+runs 87 checks with ~60 fake players: lobby limits, wallet, invites, GPS and Bluetooth distance,
+the zone rules, catching, cheating, disconnects, payouts, fairness and rematches, then 5 random
+4–5-player games in parallel. `npm run simulate -- http://localhost:4100 randomGames` runs just
+the random games.
+
 **Build the APK yourself:** open the project in Android Studio and click Run, or
 `gradlew assembleDebug` → `app/build/outputs/apk/debug/app-debug.apk`.
 

@@ -10,7 +10,9 @@
   "scripts": {
     "start": "node src/index.js",
     "dev": "node --watch src/index.js",
-    "test": "node --test \"test/*.test.js\""
+    "test": "node --test \"test/*.test.js\"",
+    "sim:server": "node scripts/sim-server.js",
+    "simulate": "node scripts/simulate.js"
   },
   "dependencies": {
     "express": "^5.1.0",
