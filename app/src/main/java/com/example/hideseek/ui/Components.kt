@@ -1,5 +1,7 @@
 package com.example.hideseek.ui
 
+import android.content.Context
+import android.content.Intent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -38,6 +40,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.hideseek.ui.theme.Hs
 import androidx.compose.material3.Button as M3Button
+
+fun Context.shareText(text: String) {
+    val send = Intent(Intent.ACTION_SEND).setType("text/plain").putExtra(Intent.EXTRA_TEXT, text)
+    startActivity(Intent.createChooser(send, "Share room code"))
+}
 
 /** Standard page: dark background, safe-area padding, optional vertical scroll. */
 @Composable

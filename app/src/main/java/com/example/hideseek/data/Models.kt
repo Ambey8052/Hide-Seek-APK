@@ -3,7 +3,7 @@ package com.example.hideseek.data
 import org.json.JSONArray
 import org.json.JSONObject
 
-// Mirrors of the JSON the game server sends (server/src/game/Room.js snapshotFor, http.js).
+// Mirrors of the JSON the host phone sends (engine/RoomEngine.snapshotFor).
 // Android's JSONObject.optString() turns JSON null into the string "null", so nullable
 // fields go through the helpers below.
 
@@ -67,13 +67,6 @@ data class Wallet(
     }
 }
 
-data class Friend(val id: String, val name: String, val xp: Int, val gamesWon: Int, val online: Boolean) {
-    companion object {
-        fun parse(o: JSONObject) =
-            Friend(o.getString("id"), o.optString("name"), o.optInt("xp"), o.optInt("gamesWon"), o.optBoolean("online"))
-    }
-}
-
 data class RankRow(
     val rank: Int, val id: String, val name: String, val xp: Int, val gamesPlayed: Int,
     val gamesWon: Int, val catches: Int, val totalWonRs: Double, val isMe: Boolean,
@@ -99,13 +92,8 @@ data class GameHistory(
     }
 }
 
-data class Invite(val code: String, val fromName: String, val feeRs: Double, val isFree: Boolean, val players: Int) {
-    companion object {
-        fun parse(o: JSONObject) = Invite(
-            o.optString("code"), o.optString("fromName"), o.optDouble("feeRs", 0.0), o.optBoolean("isFree"), o.optInt("players"),
-        )
-    }
-}
+/** A room being advertised by a host phone nearby (Bluetooth / Wi-Fi). */
+data class NearbyRoom(val endpointId: String, val code: String, val hostName: String)
 
 // ------------------------------------------------------------------ room snapshot
 
@@ -164,10 +152,12 @@ data class GameResult(
     val platformFeeRs: Double,
     val isFree: Boolean,
     val refunded: Boolean,
+    val policeCatches: Int,
 )
 
 data class Room(
     val code: String,
+    val gameId: String,
     val hostId: String,
     val phase: String,
     val feeRs: Double,
@@ -175,6 +165,7 @@ data class Room(
     val potRs: Double,
     val boundaryMode: String,
     val heatMeter: Boolean,
+    val quick: Boolean,
     val rules: Rules,
     val seedHash: String,
     val serverSeed: String?,
@@ -199,6 +190,7 @@ data class Room(
             val s = o.optJSONObject("settings") ?: JSONObject()
             return Room(
                 code = o.getString("code"),
+                gameId = o.optString("gameId"),
                 hostId = o.getString("hostId"),
                 phase = o.getString("phase"),
                 feeRs = o.optDouble("feeRs", 0.0),
@@ -206,6 +198,7 @@ data class Room(
                 potRs = o.optDouble("potRs", 0.0),
                 boundaryMode = s.optString("boundaryMode", "police"),
                 heatMeter = s.optBoolean("heatMeter", true),
+                quick = s.optBoolean("quick"),
                 rules = Rules(
                     r.optInt("minPlayers", 2), r.optInt("maxPlayers", 10), r.optInt("boundaryM", 100),
                     r.optInt("graceSec", 30), r.optInt("maxStrikes", 3), r.optInt("gameSec", 1200),
@@ -261,6 +254,7 @@ data class Room(
                         platformFeeRs = res.optDouble("platformFeeRs", 0.0),
                         isFree = res.optBoolean("isFree"),
                         refunded = res.optBoolean("refunded"),
+                        policeCatches = res.optInt("policeCatches"),
                     )
                 },
             )

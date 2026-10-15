@@ -13,11 +13,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,7 +26,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.hideseek.app
-import com.example.hideseek.data.Wallet
 import com.example.hideseek.device.formatRs
 import com.example.hideseek.ui.Body
 import com.example.hideseek.ui.Chip
@@ -41,8 +39,6 @@ import com.example.hideseek.ui.HsTextField
 import com.example.hideseek.ui.Label
 import com.example.hideseek.ui.Variant
 import com.example.hideseek.ui.theme.Hs
-import kotlinx.coroutines.launch
-import org.json.JSONObject
 import java.text.DateFormat
 import java.util.Date
 import kotlin.math.abs
@@ -54,46 +50,33 @@ private val TYPE_LABEL = mapOf(
     "ENTRY_FEE" to "🎮 Game entry",
     "WINNINGS" to "🏆 Winnings",
     "REFUND" to "↩ Refund",
+    "CARRIED" to "… Earlier history",
 )
 
 fun formatTime(ms: Long): String = DateFormat.getDateTimeInstance(DateFormat.MEDIUM, DateFormat.SHORT).format(Date(ms))
 
 @Composable
 fun WalletScreen(onBack: () -> Unit) {
-    val session = LocalContext.current.app.session
-    val scope = rememberCoroutineScope()
-    var w by remember { mutableStateOf<Wallet?>(null) }
+    val profile = LocalContext.current.app.profile
+    val wallet by profile.wallet.collectAsState()
     var amount by remember { mutableStateOf("100") }
     var withdraw by remember { mutableStateOf("") }
-    var busy by remember { mutableStateOf<String?>(null) }
     var error by remember { mutableStateOf<String?>(null) }
 
-    LaunchedEffect(Unit) {
-        try {
-            w = Wallet.parse(session.get("/api/wallet") as JSONObject)
-        } catch (e: Exception) {
-            error = e.message
-        }
-    }
-
-    fun run(key: String, path: String, rs: String) = scope.launch {
-        busy = key
+    fun run(key: String, rs: String) {
         error = null
         try {
-            w = Wallet.parse(session.post(path, JSONObject().put("amountRs", rs.toDoubleOrNull() ?: 0.0)) as JSONObject)
+            val value = rs.toDoubleOrNull() ?: 0.0
+            if (key == "deposit") profile.deposit(value) else profile.withdraw(value)
             if (key == "withdraw") withdraw = ""
         } catch (e: Exception) {
             error = e.message
-        } finally {
-            busy = null
         }
     }
 
-    HsPage("Wallet", onBack) {
-        val wallet = w
-        if (wallet == null) {
-            if (error != null) ErrorText(error) else Body("Loading…", dim = true)
-            return@HsPage
+    HsPage("Test wallet", onBack) {
+        HsCard(borderColor = Hs.Primary) {
+            Body("Offline test build: this is play money kept on this phone only. Nothing is charged or paid out.", size = 13)
         }
         HsCard {
             Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -121,28 +104,25 @@ fun WalletScreen(onBack: () -> Unit) {
             val amt = amount.toDoubleOrNull() ?: 0.0
             HsButton(
                 "Add ${formatRs(amt)}",
-                onClick = { run("deposit", "/api/wallet/deposit", amount) },
-                loading = busy == "deposit",
+                onClick = { run("deposit", amount) },
                 enabled = amt > 0 && amt <= wallet.canDepositTodayRs,
             )
             Body(
-                "You can add up to ${formatRs(wallet.canDepositTodayRs)} more today (max ₹500 per day). " +
-                    "Payments go through UPI / cards via the payment gateway (instant in test mode).",
+                "You can add up to ${formatRs(wallet.canDepositTodayRs)} more today (max ₹500 per day).",
                 dim = true, size = 12,
             )
         }
 
         HsCard {
-            Label("Withdraw to bank / UPI")
+            Label("Remove test money")
             HRow {
                 HsTextField(withdraw, { withdraw = it.filter(Char::isDigit) }, "Amount", Modifier.weight(1f), KeyboardType.Number, 5)
                 val wd = withdraw.toDoubleOrNull() ?: 0.0
                 HsButton(
                     "Withdraw",
-                    onClick = { run("withdraw", "/api/wallet/withdraw", withdraw) },
+                    onClick = { run("withdraw", withdraw) },
                     modifier = Modifier.width(120.dp),
                     variant = Variant.Secondary,
-                    loading = busy == "withdraw",
                     enabled = wd > 0 && wd <= wallet.balanceRs,
                     small = true,
                 )

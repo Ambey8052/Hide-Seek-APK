@@ -7,8 +7,9 @@ import com.example.hideseek.ui.HsPage
 import com.example.hideseek.ui.Label
 
 private val SECTIONS = listOf(
-    "1 · Make a room" to "Create a room, pick the entry fee (₹10–₹100, same for everyone) or use your daily free game. Share the 6-letter code or invite friends. 2–10 players.",
-    "2 · Get ready" to "Everyone taps \"I'm in\". Entry fees are only taken from wallets when the host starts — all at once, or nobody is charged.",
+    "0 · No internet needed" to "Phones connect to each other directly over Bluetooth and Wi-Fi. One phone hosts the game; everyone else stays within about 30 m of it while joining. Keep Bluetooth, Wi-Fi and Location switched on.",
+    "1 · Make a room" to "One player taps Create room — their phone becomes the host. Pick a free game or a test-money entry fee (₹10–₹100, same for everyone). Everyone else opens the app nearby and taps the room under \"Join a game nearby\" (or types the 6-letter code). 2–10 players.",
+    "2 · Get ready" to "Everyone taps \"I'm in\". Test-money entry fees are only taken from wallets when the host starts — all at once, or nobody is charged.",
     "3 · Shake to flip" to "Each phone shows a face-down card. Shake your phone to flip it. One player becomes 👮 SIPAHI (police); everyone else is 🦹 CHOR (thief). Only you see your card until everyone has flipped.",
     "4 · Hide" to "Thieves get a 90-second head start while the police screen is blacked out. Stay within 100 m of the police phone at all times.",
     "5 · The hunt (20 min)" to "The police phone vibrates when a thief is within 1 m. A thief sees a green dot when the police is that close. In the final 2 minutes the police radar widens to 10 m. Every 3 minutes the police gets a radar pulse showing how many thieves are at each distance.",
@@ -19,12 +20,12 @@ private val SECTIONS = listOf(
 )
 
 private val FAIR = listOf(
-    "Nobody — not even the server — can choose who becomes police. The server locks in a secret seed (its fingerprint is the \"fairness seal\" in the lobby) before anyone joins. Every player adds their own random seed. The police is calculated from all of them, and the secret is revealed after the game so anyone can check.",
+    "Nobody — not even the host phone — can choose who becomes police. The host locks in a secret seed (its fingerprint is the \"fairness seal\" in the lobby) before anyone joins. Every player adds their own random seed. The police is calculated from all of them, and the secret is revealed after the game so anyone can check.",
     "The same person can't be police twice in a row in a rematch.",
     "Fake-GPS apps are detected and the player is disqualified.",
-    "If the server restarts or the police loses connection for 3 minutes, the game is cancelled and everyone is refunded in full.",
+    "If the police loses GPS / connection for 3 minutes, the game is cancelled and everyone is refunded in full. If the host leaves, the room closes for everyone, so the host should keep the app open.",
     "Close-range alerts use Bluetooth signal strength when available, and GPS otherwise. Zone checks give thieves the benefit of GPS error, so nobody is punished for GPS drift at the zone edge.",
-    "Max ₹500 can be added to a wallet per day. One free game per player per day.",
+    "This test build uses play money kept on each phone (max ₹500 added per day). Free games are unlimited.",
 )
 
 @Composable

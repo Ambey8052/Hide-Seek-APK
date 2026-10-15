@@ -98,7 +98,7 @@ private const val MAX_RESEND_AGE_MS = 15_000L
 private fun Context.hasLocationPermission() =
     ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
 
-/** While [active], streams high-accuracy GPS fixes to the server as "loc" events. */
+/** While [active], streams high-accuracy GPS fixes to the host as "loc" events. */
 @SuppressLint("MissingPermission")
 @Composable
 fun rememberLocationReporter(active: Boolean, game: GameClient): GpsState {
@@ -149,7 +149,7 @@ fun rememberLocationReporter(active: Boolean, game: GameClient): GpsState {
     }
 
     // A player standing perfectly still may get few updates; re-send the latest fix so the
-    // server doesn't think they lost signal. Old fixes are never re-sent.
+    // host doesn't think they lost signal. Old fixes are never re-sent.
     LaunchedEffect(active) {
         while (active) {
             delay(KEEPALIVE_MS)
@@ -182,7 +182,7 @@ fun Context.stopVibration() = vibrator()?.cancel()
 
 // ------------------------------------------------------------------ misc
 
-/** Server-synced current time, refreshed every [intervalMs]. */
+/** Host-synced current time, refreshed every [intervalMs]. */
 @Composable
 fun rememberServerNow(game: GameClient, intervalMs: Long = 250): Long {
     val now by produceState(game.serverNow()) {

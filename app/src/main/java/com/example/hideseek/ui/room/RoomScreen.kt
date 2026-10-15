@@ -37,6 +37,7 @@ import com.example.hideseek.Screen
 import com.example.hideseek.app
 import com.example.hideseek.data.GameClient
 import com.example.hideseek.data.GameEvent
+import com.example.hideseek.data.Mode
 import com.example.hideseek.data.Phase
 import com.example.hideseek.data.Room
 import com.example.hideseek.device.BleStatus
@@ -58,7 +59,6 @@ class RoomCtx(
     val gps: GpsState,
     val ble: BleStatus,
     val onLeave: () -> Unit,
-    val openFriends: () -> Unit,
 ) {
     val me get() = room.me!!
     val userId get() = me.userId
@@ -73,6 +73,7 @@ fun RoomScreen(nav: Nav) {
     val game = app.game
     val room by game.room.collectAsState()
     val roomLoaded by game.roomLoaded.collectAsState()
+    val connected by game.connected.collectAsState()
     val scope = rememberCoroutineScope()
     val now = rememberServerNow(game)
     var confirmLeave by remember { mutableStateOf(false) }
@@ -100,7 +101,7 @@ fun RoomScreen(nav: Nav) {
     if (r?.me == null) return
     if (inGame) KeepScreenOn()
 
-    val ctx = RoomCtx(r, game, now, gps, ble, onLeave, openFriends = { nav.push(Screen.Friends) })
+    val ctx = RoomCtx(r, game, now, gps, ble, onLeave)
     Box(Modifier.fillMaxSize()) {
         when (r.phase) {
             Phase.LOBBY -> Lobby(ctx)
@@ -114,16 +115,23 @@ fun RoomScreen(nav: Nav) {
             else -> if (r.result != null) Result(ctx)
         }
         EventToast(r)
+        if (!connected) ReconnectingBanner()
     }
 
     if (confirmLeave) {
         val forfeit = inGame && r.me.isActive
+        val hosting = r.hostId == r.me.userId && game.mode.value == Mode.HOST
         AlertDialog(
             onDismissRequest = { confirmLeave = false },
             title = { Text(if (forfeit) "Leave the game?" else "Leave the room?") },
             text = {
-                if (forfeit) {
-                    Text(
+                when {
+                    hosting -> Text(
+                        if (inGame) "Your phone is hosting this game. Leaving cancels it for everyone (entry fees are refunded)."
+                        else "Your phone is hosting this room. Leaving closes it for everyone.",
+                    )
+                    !connected && forfeit -> Text("The host phone can't be reached. Leaving cancels the game for you and refunds your entry.")
+                    forfeit -> Text(
                         if (r.me.isPolice) "You will forfeit and the remaining thieves win the pot."
                         else "You'll be out of the game and lose your entry fee.",
                     )
@@ -188,5 +196,20 @@ private fun EventToast(room: Room) {
 
     Box(Modifier.fillMaxSize().safeDrawingPadding(), contentAlignment = Alignment.TopCenter) {
         BoxScopeToast(shown, visible)
+    }
+}
+
+/** Guest lost the host: the game keeps its last state while we look for the host again. */
+@Composable
+private fun ReconnectingBanner() {
+    Box(Modifier.fillMaxSize().safeDrawingPadding(), contentAlignment = Alignment.BottomCenter) {
+        Text(
+            "📡 Lost the host phone — reconnecting… move closer to the host",
+            color = Color.White,
+            fontWeight = FontWeight.Bold,
+            fontSize = 14.sp,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth().padding(16.dp).background(Hs.Danger, RoundedCornerShape(14.dp)).padding(12.dp),
+        )
     }
 }

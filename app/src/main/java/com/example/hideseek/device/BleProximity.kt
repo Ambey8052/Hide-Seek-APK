@@ -31,8 +31,8 @@ import org.json.JSONObject
 import java.util.concurrent.ConcurrentHashMap
 
 // Bluetooth LE proximity. During a game every phone broadcasts a tiny advertisement
-// ("HS" + its 4-byte game tag from the server) and scans for the others. The signal
-// strength (RSSI) of each tag heard is sent to the server once per second; the server
+// ("HS" + its 4-byte game tag from the host) and scans for the others. The signal
+// strength (RSSI) of each tag heard is sent to the host once per second; the host
 // turns it into "police within ~1 m" far more reliably than GPS can.
 // The tag is random per game and means nothing outside it, so no identity is broadcast.
 
@@ -54,7 +54,7 @@ private fun Context.hasBlePermissions() = BLE_PERMISSIONS.all {
 private fun hexToBytes(hex: String) = ByteArray(hex.length / 2) { hex.substring(it * 2, it * 2 + 2).toInt(16).toByte() }
 private fun bytesToHex(b: ByteArray) = b.joinToString("") { "%02x".format(it) }
 
-/** While [active], advertises [tag] and reports nearby players' tags to the server. */
+/** While [active], advertises [tag] and reports nearby players' tags to the host. */
 @SuppressLint("MissingPermission")
 @Composable
 fun rememberBleProximity(active: Boolean, tag: String?, game: GameClient): BleStatus {

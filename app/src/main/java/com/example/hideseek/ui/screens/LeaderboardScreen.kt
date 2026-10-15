@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,14 +21,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.hideseek.app
-import com.example.hideseek.data.GameHistory
-import com.example.hideseek.data.RankRow
-import com.example.hideseek.data.asArray
-import com.example.hideseek.data.mapObjects
 import com.example.hideseek.device.formatRs
 import com.example.hideseek.ui.Body
 import com.example.hideseek.ui.Chip
-import com.example.hideseek.ui.ErrorText
 import com.example.hideseek.ui.HRow
 import com.example.hideseek.ui.HsCard
 import com.example.hideseek.ui.HsPage
@@ -38,27 +33,16 @@ private val MEDALS = listOf("🥇", "🥈", "🥉")
 
 @Composable
 fun LeaderboardScreen(onBack: () -> Unit) {
-    val session = LocalContext.current.app.session
+    val profile = LocalContext.current.app.profile
     var tab by remember { mutableStateOf("ranking") }
-    var board by remember { mutableStateOf<List<RankRow>>(emptyList()) }
-    var games by remember { mutableStateOf<List<GameHistory>>(emptyList()) }
-    var error by remember { mutableStateOf<String?>(null) }
-
-    LaunchedEffect(Unit) {
-        try {
-            board = session.get("/api/leaderboard").asArray().mapObjects(RankRow::parse)
-            games = session.get("/api/games").asArray().mapObjects(GameHistory::parse)
-        } catch (e: Exception) {
-            error = e.message
-        }
-    }
+    val games by profile.history.collectAsState()
+    val board = remember(games) { profile.ranking() }
 
     HsPage("Leaderboard & History", onBack) {
         HRow {
-            Chip("🏆 Friends ranking", tab == "ranking", { tab = "ranking" })
+            Chip("🏆 Players you've met", tab == "ranking", { tab = "ranking" })
             Chip("🕑 My games", tab == "games", { tab = "games" })
         }
-        ErrorText(error)
 
         HsCard {
             if (tab == "ranking") {

@@ -48,11 +48,11 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.play.services.location)
     implementation(libs.zxing.android.embedded)
-    implementation(libs.socketio.client) {
-        // Android ships its own org.json
-        exclude(group = "org.json", module = "json")
-    }
+    // Offline multiplayer: phones talk directly over Bluetooth / Wi-Fi, no server.
+    implementation(libs.play.services.nearby)
     testImplementation(libs.junit)
+    // Real org.json for JVM unit tests of the game engine (Android's copy is a stub there).
+    testImplementation(libs.org.json)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     androidTestImplementation(libs.androidx.espresso.core)
