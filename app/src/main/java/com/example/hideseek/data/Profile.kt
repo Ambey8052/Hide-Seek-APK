@@ -51,18 +51,23 @@ class Profile(context: Context) {
             code = (1..8).map { CODE_ALPHABET[r.nextInt(CODE_ALPHABET.length)] }.joinToString(""),
             gamesPlayed = 0, gamesWon = 0, catches = 0, xp = 0, totalWonRs = 0.0,
         )
-        saveUser(user)
+        // Runs while _user is being initialised, so only persist here.
+        persistUser(user)
         return user
     }
 
     private fun saveUser(u: User) {
+        persistUser(u)
+        _user.value = u
+    }
+
+    private fun persistUser(u: User) {
         prefs.edit().putString(
             KEY_USER,
             JSONObject().put("id", u.id).put("name", u.name).put("code", u.code).put("gamesPlayed", u.gamesPlayed)
                 .put("gamesWon", u.gamesWon).put("catches", u.catches).put("xp", u.xp).put("totalWonRs", u.totalWonRs)
                 .toString(),
         ).apply()
-        _user.value = u
     }
 
     fun updateName(name: String) {

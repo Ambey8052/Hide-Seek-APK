@@ -288,7 +288,8 @@ private fun Slides(animate: Boolean) {
                     ) { Text("${i + 1}", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Black) }
                     Text(slide.title, color = Hs.Text, fontSize = 18.sp, fontWeight = FontWeight.ExtraBold)
                 }
-                Body(slide.text, modifier = Modifier.heightIn(min = 110.dp))
+                // Same height on every slide so the page (and the Next button) doesn't jump around.
+                Body(slide.text, modifier = Modifier.heightIn(min = 160.dp))
             }
         }
         Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center) {
