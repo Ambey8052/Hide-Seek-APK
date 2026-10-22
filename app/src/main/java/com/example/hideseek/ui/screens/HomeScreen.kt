@@ -47,6 +47,7 @@ import com.example.hideseek.app
 import com.example.hideseek.data.NearbyRoom
 import com.example.hideseek.device.formatRs
 import com.example.hideseek.net.NEARBY_PERMISSIONS
+import com.example.hideseek.net.missingNearbyPermissions
 import com.example.hideseek.ui.Body
 import com.example.hideseek.ui.Chip
 import com.example.hideseek.ui.ChipRow
@@ -65,8 +66,7 @@ import kotlinx.coroutines.launch
 
 val FEES = listOf(10, 20, 30, 50, 75, 100)
 
-private fun Context.missingNearbyPermissions() =
-    NEARBY_PERMISSIONS.filter { ContextCompat.checkSelfPermission(this, it) != PackageManager.PERMISSION_GRANTED }
+private fun Context.missingNearbyPermissions() = missingNearbyPermissions(this)
 
 @Composable
 fun HomeScreen(nav: Nav) {

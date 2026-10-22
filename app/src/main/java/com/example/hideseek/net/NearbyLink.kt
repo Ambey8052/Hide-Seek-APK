@@ -2,7 +2,9 @@ package com.example.hideseek.net
 
 import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Build
+import androidx.core.content.ContextCompat
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.nearby.Nearby
 import com.google.android.gms.nearby.connection.AdvertisingOptions
@@ -41,6 +43,24 @@ val NEARBY_PERMISSIONS: Array<String> = buildList {
     }
     if (Build.VERSION.SDK_INT >= 33) add(Manifest.permission.NEARBY_WIFI_DEVICES)
 }.toTypedArray()
+
+/**
+ * Permissions from [NEARBY_PERMISSIONS] still blocking Nearby. We ask for precise location,
+ * but on Android 12+ the user may pick "Approximate": Bluetooth scanning there is covered by
+ * BLUETOOTH_SCAN, so either location grant is enough. Android 10-11 need precise location.
+ */
+fun missingNearbyPermissions(context: Context): List<String> {
+    fun has(p: String) = ContextCompat.checkSelfPermission(context, p) == PackageManager.PERMISSION_GRANTED
+    val fine = Manifest.permission.ACCESS_FINE_LOCATION
+    val coarse = Manifest.permission.ACCESS_COARSE_LOCATION
+    val locationOk = when {
+        Build.VERSION.SDK_INT >= 31 || Build.VERSION.SDK_INT <= 28 -> has(fine) || has(coarse)
+        else -> has(fine)
+    }
+    return NEARBY_PERMISSIONS.filter { p ->
+        if (p == fine || p == coarse) !locationOk else !has(p)
+    }
+}
 
 interface LinkListener {
     /** Discovery: a host is advertising room [code]. */
